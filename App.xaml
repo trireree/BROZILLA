@@ -1,0 +1,11 @@
+<Application x:Class="BROZILLA.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnExplicitShutdown">
+    <Application.Resources>
+        <!-- Global Clean Font & Smooth Scrollbar / ComboBox Styles -->
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        </Style>
+    </Application.Resources>
+</Application>

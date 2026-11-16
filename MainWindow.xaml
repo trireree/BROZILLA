@@ -1,0 +1,597 @@
+<Window x:Class="BROZILLA.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="BROZILLA"
+        Width="420"
+        Height="610"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanMinimize"
+        Icon="Assets/app.ico"
+        Closing="Window_Closing"
+        IsVisibleChanged="Window_IsVisibleChanged">
+
+    <Window.Resources>
+        <!-- Soft 3D Clay Button Style for Window Controls & Test Pill -->
+        <Style x:Key="ClayPillButton" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="Foreground" Value="#475569" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#E2E8F0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="14"
+                                Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#CBD5E1" Direction="315" ShadowDepth="3" BlurRadius="10" Opacity="0.65" />
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#F8FAFC" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.95" ScaleY="0.95" CenterX="16" CenterY="16" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Clean 3D Clay ComboBox Style -->
+        <Style x:Key="ClayComboBox" TargetType="ComboBox">
+            <Setter Property="Background" Value="#F8FAFC" />
+            <Setter Property="Foreground" Value="#1E293B" />
+            <Setter Property="BorderBrush" Value="#E2E8F0" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Grid.Column="2"
+                                          Focusable="false"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="Border"
+                                                Background="#F8FAFC"
+                                                BorderBrush="#E2E8F0"
+                                                BorderThickness="1.2"
+                                                CornerRadius="14"
+                                                Padding="12,9">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="24" />
+                                                </Grid.ColumnDefinitions>
+                                                <Path Grid.Column="1"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      Data="M 0 0 L 5 5 L 10 0"
+                                                      Stroke="#64748B"
+                                                      StrokeThickness="2"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round" />
+                                            </Grid>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#FFFFFF" />
+                                                <Setter TargetName="Border" Property="BorderBrush" Value="#CBD5E1" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <ContentPresenter x:Name="ContentSite"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="14,8,34,8"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left" />
+
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Grid x:Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="250"
+                                      Margin="0,6,0,8">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="#FFFFFF"
+                                            BorderBrush="#E2E8F0"
+                                            BorderThickness="1"
+                                            CornerRadius="16"
+                                            Padding="4">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="#94A3B8" Direction="270" ShadowDepth="8" BlurRadius="22" Opacity="0.28" />
+                                        </Border.Effect>
+                                        <ScrollViewer SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Padding" Value="10,8" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBoxItem">
+                                    <Border x:Name="ItemBd"
+                                            Background="Transparent"
+                                            CornerRadius="10"
+                                            Padding="{TemplateBinding Padding}"
+                                            Margin="2">
+                                        <ContentPresenter />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsHighlighted" Value="True">
+                                            <Setter TargetName="ItemBd" Property="Background" Value="#F1F5F9" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="ItemBd" Property="Background" Value="#ECFDF5" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Continuous Active Animations (Paused automatically when minimized to tray) -->
+        <Storyboard x:Key="ActiveLoopStoryboard" RepeatBehavior="Forever">
+            <!-- Rotating Orbital Arc -->
+            <DoubleAnimation Storyboard.TargetName="OrbitRotate"
+                             Storyboard.TargetProperty="Angle"
+                             From="0" To="360" Duration="0:0:8" />
+
+            <!-- Pulse Ring 1 -->
+            <DoubleAnimation Storyboard.TargetName="PulseScale1"
+                             Storyboard.TargetProperty="ScaleX"
+                             From="0.86" To="1.36" Duration="0:0:2.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="PulseScale1"
+                             Storyboard.TargetProperty="ScaleY"
+                             From="0.86" To="1.36" Duration="0:0:2.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="PulseRing1"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.55" To="0" Duration="0:0:2.4" />
+
+            <!-- Pulse Ring 2 (Staggered) -->
+            <DoubleAnimation Storyboard.TargetName="PulseScale2"
+                             Storyboard.TargetProperty="ScaleX"
+                             BeginTime="0:0:1.2"
+                             From="0.86" To="1.36" Duration="0:0:2.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="PulseScale2"
+                             Storyboard.TargetProperty="ScaleY"
+                             BeginTime="0:0:1.2"
+                             From="0.86" To="1.36" Duration="0:0:2.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="PulseRing2"
+                             Storyboard.TargetProperty="Opacity"
+                             BeginTime="0:0:1.2"
+                             From="0.45" To="0" Duration="0:0:2.4" />
+
+            <!-- Subtle 3D Shield Float -->
+            <DoubleAnimation Storyboard.TargetName="ShieldFloatTransform"
+                             Storyboard.TargetProperty="Y"
+                             From="-2.5" To="2.5" Duration="0:0:2.0"
+                             AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+
+            <!-- Breathing Active Glow -->
+            <DoubleAnimation Storyboard.TargetName="ActiveGlow"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0.45" To="0.85" Duration="0:0:1.8"
+                             AutoReverse="True">
+                <DoubleAnimation.EasingFunction>
+                    <SineEase EasingMode="EaseInOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+    </Window.Resources>
+
+    <!-- Outer Shadow Padding -->
+    <Grid Margin="18">
+        <Border x:Name="MainCard"
+                CornerRadius="30"
+                BorderThickness="1.5"
+                BorderBrush="#FFFFFF">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#FFFFFF" Offset="0" />
+                    <GradientStop Color="#F8FAFC" Offset="0.5" />
+                    <GradientStop Color="#F1F5F9" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.Effect>
+                <DropShadowEffect Color="#94A3B8" Direction="270" ShadowDepth="10" BlurRadius="28" Opacity="0.32" />
+            </Border.Effect>
+
+            <Grid Margin="22,18,22,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- 1. Draggable Premium Header -->
+                <Grid Grid.Row="0" Background="Transparent" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Mini 3D Logo Badge -->
+                    <Border Width="38" Height="38" CornerRadius="12" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#CBD5E1" Direction="315" ShadowDepth="3" BlurRadius="8" Opacity="0.7" />
+                        </Border.Effect>
+                        <Image Source="Assets/brozilla_logo.png" Width="26" Height="26" RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                        <TextBlock Text="BROZILLA"
+                                   FontSize="17"
+                                   FontWeight="ExtraBold"
+                                   Foreground="#1E293B" />
+                        <TextBlock Text="3D DPI KALKANI"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   Foreground="#94A3B8" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource ClayPillButton}"
+                                Width="32" Height="32"
+                                Margin="0,0,8,0"
+                                ToolTip="Görev Çubuğuna Küçült"
+                                Click="MinimizeButton_Click">
+                            <Path Data="M 0 0 L 10 0" Stroke="#64748B" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                        </Button>
+                        <Button Style="{StaticResource ClayPillButton}"
+                                Width="32" Height="32"
+                                ToolTip="Tepsiye Gizle"
+                                Click="CloseToTrayButton_Click">
+                            <Path Data="M 0 0 L 9 9 M 9 0 L 0 9" Stroke="#64748B" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 2. Hero Centerpiece: Creative 3D Animated Power Shield -->
+                <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Width="260" Height="260" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <!-- Expanding Pulse Rings (Visible when Active) -->
+                        <Ellipse x:Name="PulseRing1"
+                                 Width="190" Height="190"
+                                 Stroke="#10B981"
+                                 StrokeThickness="2.5"
+                                 Opacity="0"
+                                 RenderTransformOrigin="0.5,0.5"
+                                 IsHitTestVisible="False">
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform x:Name="PulseScale1" ScaleX="0.86" ScaleY="0.86" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+
+                        <Ellipse x:Name="PulseRing2"
+                                 Width="190" Height="190"
+                                 Stroke="#06B6D4"
+                                 StrokeThickness="2"
+                                 Opacity="0"
+                                 RenderTransformOrigin="0.5,0.5"
+                                 IsHitTestVisible="False">
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform x:Name="PulseScale2" ScaleX="0.86" ScaleY="0.86" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+
+                        <!-- Active Emerald/Cyan Glow Halo -->
+                        <Ellipse x:Name="ActiveGlow"
+                                 Width="212" Height="212"
+                                 Opacity="0"
+                                 IsHitTestVisible="False">
+                            <Ellipse.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#6610B981" Offset="0.45" />
+                                    <GradientStop Color="#3306B6D4" Offset="0.72" />
+                                    <GradientStop Color="#00FFFFFF" Offset="1" />
+                                </RadialGradientBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+
+                        <!-- Outer Recessed 3D Clay Well -->
+                        <Border Width="216" Height="216"
+                                CornerRadius="108"
+                                BorderThickness="1.5"
+                                BorderBrush="#FFFFFF">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#E2E8F0" Offset="0" />
+                                    <GradientStop Color="#F1F5F9" Offset="0.5" />
+                                    <GradientStop Color="#FFFFFF" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.Effect>
+                                <DropShadowEffect Color="#FFFFFF" Direction="135" ShadowDepth="4" BlurRadius="12" Opacity="0.9" />
+                            </Border.Effect>
+                        </Border>
+
+                        <!-- Rotating Orbital Energy Arc -->
+                        <Ellipse x:Name="OrbitRing"
+                                 Width="202" Height="202"
+                                 StrokeThickness="3"
+                                 StrokeDashArray="16 8 4 8"
+                                 StrokeDashCap="Round"
+                                 Opacity="0"
+                                 RenderTransformOrigin="0.5,0.5"
+                                 IsHitTestVisible="False">
+                            <Ellipse.Stroke>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#10B981" Offset="0" />
+                                    <GradientStop Color="#06B6D4" Offset="1" />
+                                </LinearGradientBrush>
+                            </Ellipse.Stroke>
+                            <Ellipse.RenderTransform>
+                                <RotateTransform x:Name="OrbitRotate" Angle="0" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+
+                        <!-- Main Tactile 3D Clay Shield Button -->
+                        <Border x:Name="PowerButton"
+                                Width="174" Height="174"
+                                CornerRadius="87"
+                                Cursor="Hand"
+                                BorderThickness="2"
+                                BorderBrush="#FFFFFF"
+                                RenderTransformOrigin="0.5,0.5"
+                                MouseEnter="PowerButton_MouseEnter"
+                                MouseLeave="PowerButton_MouseLeave"
+                                MouseLeftButtonDown="PowerButton_MouseLeftButtonDown"
+                                MouseLeftButtonUp="PowerButton_MouseLeftButtonUp">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="PowerScale" ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                            <Border.Background>
+                                <LinearGradientBrush x:Name="PowerBgBrush" StartPoint="0.15,0.1" EndPoint="0.85,0.9">
+                                    <GradientStop Color="#FFFFFF" Offset="0" />
+                                    <GradientStop Color="#F8FAFC" Offset="0.55" />
+                                    <GradientStop Color="#E2E8F0" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.Effect>
+                                <DropShadowEffect x:Name="PowerShadow" Color="#94A3B8" Direction="315" ShadowDepth="10" BlurRadius="22" Opacity="0.55" />
+                            </Border.Effect>
+
+                            <Grid>
+                                <!-- Inner Specular Rim -->
+                                <Ellipse Width="158" Height="158"
+                                         Stroke="#FFFFFF"
+                                         StrokeThickness="1.5"
+                                         Opacity="0.85" />
+
+                                <!-- User's 3D Clay Shield Logo -->
+                                <Image x:Name="ShieldLogoImage"
+                                       Source="Assets/brozilla_logo.png"
+                                       Width="112" Height="112"
+                                       RenderOptions.BitmapScalingMode="HighQuality"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center">
+                                    <Image.RenderTransform>
+                                        <TranslateTransform x:Name="ShieldFloatTransform" Y="0" />
+                                    </Image.RenderTransform>
+                                    <Image.Effect>
+                                        <DropShadowEffect Color="#64748B" Direction="315" ShadowDepth="4" BlurRadius="10" Opacity="0.35" />
+                                    </Image.Effect>
+                                </Image>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- Status Pill & Uptime -->
+                    <Border Grid.Row="1"
+                            x:Name="StatusPill"
+                            Margin="0,6,0,0"
+                            Padding="16,8"
+                            CornerRadius="20"
+                            Background="#FFFFFF"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1.2"
+                            HorizontalAlignment="Center">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#CBD5E1" Direction="315" ShadowDepth="4" BlurRadius="12" Opacity="0.6" />
+                        </Border.Effect>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse x:Name="StatusDot" Width="10" Height="10" Fill="#94A3B8" Margin="0,0,8,0" />
+                            <TextBlock x:Name="StatusText"
+                                       Text="KORUMA KAPALI"
+                                       FontSize="12"
+                                       FontWeight="Bold"
+                                       Foreground="#475569" />
+                            <TextBlock x:Name="UptimeText"
+                                       Text=""
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="#10B981"
+                                       Margin="8,0,0,0"
+                                       Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- 3. 3D Clay Profile Selector Card -->
+                <Border Grid.Row="2"
+                        Background="#FFFFFF"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1.2"
+                        CornerRadius="22"
+                        Padding="16,14"
+                        Margin="0,10,0,12">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#CBD5E1" Direction="315" ShadowDepth="6" BlurRadius="16" Opacity="0.55" />
+                    </Border.Effect>
+
+                    <StackPanel>
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="İSS / BAĞLANTI PROFİLİ"
+                                       FontSize="10.5"
+                                       FontWeight="Bold"
+                                       Foreground="#94A3B8"
+                                       VerticalAlignment="Center" />
+
+                            <Button x:Name="TestButton"
+                                    HorizontalAlignment="Right"
+                                    Style="{StaticResource ClayPillButton}"
+                                    Padding="10,4"
+                                    Click="TestButton_Click">
+                                <TextBlock x:Name="TestButtonText"
+                                           Text="Bağlantıyı Test Et"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="#475569" />
+                            </Button>
+                        </Grid>
+
+                        <ComboBox x:Name="ProfileCombo"
+                                  Style="{StaticResource ClayComboBox}"
+                                  SelectionChanged="ProfileCombo_SelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold" Foreground="#1E293B" />
+                                        <TextBlock Text="{Binding Subtitle}" FontSize="10.5" Foreground="#64748B" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock x:Name="FeedbackText"
+                                   Text="Başlatmak için kalkana dokun."
+                                   FontSize="11"
+                                   Foreground="#64748B"
+                                   Margin="2,8,2,0"
+                                   TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Border>
+
+                <!-- 4. Bottom Bar: Windows Startup 3D Toggle -->
+                <Grid Grid.Row="3" Margin="4,0,4,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Windows ile Başlat"
+                                   FontSize="12.5"
+                                   FontWeight="SemiBold"
+                                   Foreground="#334155" />
+                        <TextBlock Text="Açılışta tepside sessiz başlar"
+                                   FontSize="10.5"
+                                   Foreground="#94A3B8" />
+                    </StackPanel>
+
+                    <!-- Tactile 3D Toggle Switch -->
+                    <CheckBox x:Name="StartupToggle"
+                              Grid.Column="1"
+                              VerticalAlignment="Center"
+                              Cursor="Hand"
+                              Checked="StartupToggle_Changed"
+                              Unchecked="StartupToggle_Changed">
+                        <CheckBox.Template>
+                            <ControlTemplate TargetType="CheckBox">
+                                <Border x:Name="Track"
+                                        Width="50" Height="28"
+                                        CornerRadius="14"
+                                        Background="#E2E8F0"
+                                        BorderBrush="#FFFFFF"
+                                        BorderThickness="1">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#CBD5E1" Direction="315" ShadowDepth="2" BlurRadius="6" Opacity="0.6" />
+                                    </Border.Effect>
+                                    <Border x:Name="Thumb"
+                                            Width="22" Height="22"
+                                            CornerRadius="11"
+                                            Background="#FFFFFF"
+                                            HorizontalAlignment="Left"
+                                            Margin="2,0,0,0">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="#94A3B8" Direction="315" ShadowDepth="2" BlurRadius="5" Opacity="0.5" />
+                                        </Border.Effect>
+                                    </Border>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="Track" Property="Background" Value="#10B981" />
+                                        <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right" />
+                                        <Setter TargetName="Thumb" Property="Margin" Value="0,0,2,0" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </CheckBox.Template>
+                    </CheckBox>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

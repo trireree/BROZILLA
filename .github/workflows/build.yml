@@ -1,0 +1,37 @@
+name: Build BROZILLA
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish win-x64 self-contained
+        run: |
+          dotnet publish BROZILLA.csproj -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -o ./publish/BROZILLA
+
+      - name: Create Portable ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path ./publish/BROZILLA/* -DestinationPath ./publish/BROZILLA-Portable-win-x64.zip -CompressionLevel Optimal
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BROZILLA-win-x64
+          path: ./publish/BROZILLA-Portable-win-x64.zip
