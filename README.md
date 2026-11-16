@@ -16,3 +16,7 @@ dotnet publish BROZILLA.csproj -c Release -r win-x64 --self-contained true -p:Pu
 
 ## Lisans
 Bu proje [MIT Lisansı](LICENSE) altında açık kaynaklıdır. İçerdiği GoodbyeDPI ve WinDivert bileşenleri kendi açık kaynak lisanslarına tabidir.
+
+## Code Signing
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
